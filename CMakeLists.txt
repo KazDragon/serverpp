@@ -1,6 +1,6 @@
 if (POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
-    project(SERVERPP VERSION 2.0.0)
+    project(SERVERPP VERSION 0.0.1)
 else()
     project(SERVERPP)
 endif()
@@ -45,10 +45,13 @@ if (SERVERPP_COVERAGE)
 endif()
 
 set (SERVERPP_PUBLIC_SOURCE_FILES
-    src/server.cpp
+    src/tcp_server.cpp
+    src/tcp_socket.cpp
 )
 
 set (SERVERPP_PUBLIC_HEADER_FILES
+    include/serverpp/tcp_server.hpp
+    include/serverpp/tcp_socket.hpp
     include/serverpp/version.hpp
 )
 
