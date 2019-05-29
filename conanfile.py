@@ -9,7 +9,7 @@ class ConanServerpp(ConanFile):
     license = "MIT"
     settings = "os", "arch", "compiler", "build_type"
     generators = "cmake"
-    exports = "*", "!build", "!.vscode"
+    exports = "*.hpp", "*.in", "*.cpp", "CMakeLists.txt", "*.md", "LICENSE"
     description = "A library for a simple networking server"
     requires = ("boost_asio/[>=1.69]@bincrafters/stable",
                 "gsl-lite/[>=0.26]@nonstd-lite/stable")
