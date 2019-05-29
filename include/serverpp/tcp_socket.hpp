@@ -9,13 +9,13 @@ namespace serverpp {
 //* =========================================================================
 /// A TCP/IP networking socket connection
 //* =========================================================================
-class tcp_socket
+class tcp_socket final
 {
 public:
     //* =====================================================================
     /// Constructor
     //* =====================================================================
-    tcp_socket(boost::asio::ip::tcp::socket &&socket);
+    explicit tcp_socket(boost::asio::ip::tcp::socket &&socket);
 
     //* =====================================================================
     /// Writes a sequence of bytes to the underlying socket.

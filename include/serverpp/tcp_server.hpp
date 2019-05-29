@@ -8,21 +8,19 @@
 
 namespace serverpp {
 
-using port_number = std::uint16_t;
-
 //* =========================================================================
 /// A simple TCP/IP server
 //* =========================================================================
-class SERVERPP_EXPORT tcp_server
+class SERVERPP_EXPORT tcp_server final
 {
 public:
     //* =====================================================================
     /// Constructor
-    /// \param port the port number of the server.  If this is zero, then it
-    ///        is considered a wildcard port, which may bind to any unused
+    /// \param port the port identifier of the server.  If this is zero, then 
+    ///        it is considered a wildcard port, which may bind to any unused
     ///        port.  This number can be retrieved with tcp_server::port.
     //* =====================================================================
-    tcp_server(port_number port);
+    explicit tcp_server(port_identifier port);
 
     //* =====================================================================
     /// Destructor
@@ -30,9 +28,9 @@ public:
     ~tcp_server();
 
     //* =====================================================================
-    /// Returns the port number of the server.
+    /// Returns the port identifier of the server.
     //* =====================================================================
-    port_number port() const;
+    port_identifier port() const;
 
     //* =====================================================================
     /// Shut the server down.
@@ -97,7 +95,7 @@ private:
         boost::asio::io_context::executor_type> work_;
         
     boost::asio::ip::tcp::acceptor acceptor_;
-    port_number port_;
+    port_identifier port_;
 };
 
 }

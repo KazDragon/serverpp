@@ -5,7 +5,7 @@ namespace serverpp {
 // ==========================================================================
 // CONSTRUCTOR
 // ==========================================================================
-tcp_server::tcp_server(port_number port)
+tcp_server::tcp_server(port_identifier port)
   : acceptor_(
         context_,
         boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
@@ -25,7 +25,7 @@ tcp_server::~tcp_server()
 // ==========================================================================
 // PORT
 // ==========================================================================
-port_number tcp_server::port() const
+port_identifier tcp_server::port() const
 {
     return port_;
 }
