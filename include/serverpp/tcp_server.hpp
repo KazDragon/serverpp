@@ -58,9 +58,12 @@ public:
     /// Calls to this function will return before destruction is completed.
     //* =====================================================================
     template <typename AcceptanceContinuation>
-    void accept(AcceptanceContinuation&& acceptance_continuation)
+    void accept(AcceptanceContinuation &&acceptance_continuation)
     {
+        auto new_socket = boost::asio::ip::tcp::socket{context_};
+
         schedule_acceptance(
+            new_socket,
             std::forward<AcceptanceContinuation>(acceptance_continuation));
 
         context_.run();
@@ -68,22 +71,25 @@ public:
 
 private:
     template <typename AcceptanceContinuation>
-    void schedule_acceptance(AcceptanceContinuation&& acceptance_continuation)
+    void schedule_acceptance(
+        boost::asio::ip::tcp::socket &new_socket,
+        AcceptanceContinuation &&acceptance_continuation)
     {
         const auto &acceptance_handler =
             [
                 this, 
-                acceptance_continuation
+                acceptance_continuation,
+                &new_socket
             ](boost::system::error_code const &ec)
             {
                 if (!ec)
                 {
-                    acceptance_continuation(tcp_socket(std::move(new_socket_)));
-                    schedule_acceptance(acceptance_continuation);
+                    acceptance_continuation(tcp_socket(std::move(new_socket)));
+                    schedule_acceptance(new_socket, acceptance_continuation);
                 }
             };
 
-        acceptor_.async_accept(new_socket_, acceptance_handler);
+        acceptor_.async_accept(new_socket, acceptance_handler);
     }
 
     boost::asio::io_context context_;
@@ -92,8 +98,6 @@ private:
         
     boost::asio::ip::tcp::acceptor acceptor_;
     port_number port_;
-
-    boost::asio::ip::tcp::socket new_socket_;
 };
 
 }
