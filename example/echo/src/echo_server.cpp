@@ -52,7 +52,9 @@ private:
 
     void read_handler(serverpp::tcp_socket &socket, serverpp::bytes data)
     {
-        std::cout << "Received " << data.size() << " bytes of data: " << data.data() << "\n";
+        std::cout << "Received " << data.size() << " bytes of data: " 
+                  << std::string(reinterpret_cast<char const *>(data.data()), data.length()) 
+                  << "\n";
 
         if (data.empty())
         {
