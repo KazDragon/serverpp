@@ -18,6 +18,15 @@ public:
     explicit tcp_socket(boost::asio::ip::tcp::socket &&socket);
 
     //* =====================================================================
+    /// \brief Returns whether the socket is alive.
+    ///
+    /// Note: it may be that data still remains to be read.  Therefore, it
+    /// is only really worthwhile checking this as a result of receiving
+    /// a zero byte payload from async_read.
+    //* =====================================================================
+    bool is_alive() const;
+
+    //* =====================================================================
     /// Writes a sequence of bytes to the underlying socket.
     ///
     /// This function executes synchronously.  When the function returns,
@@ -31,8 +40,9 @@ public:
     /// This function executes asynchronously, and returns its result via
     /// the continuation, which must be in the form <tt>void (bytes)</tt>.
     ///
-    /// If the continuation receives zero bytes in its payload, then it is
-    /// an indication that the socket has closed.
+    /// The callback always occurs, even if the socket was terminated at the
+    /// remote end.  Therefore, the continuation receiving zero bytes is an
+    /// indication that the socket has closed.
     ///
     /// Although this is intended to be used in multiple threads (i.e. the
     /// thread that calls the continuation may be different to the thread 
@@ -52,6 +62,14 @@ public:
                     bytes{read_buffer_.data(), bytes_transferred});
             });
     }
+
+    //* =====================================================================
+    /// Closes the socket.
+    ///
+    /// This will cause any pending read to complete and is_alive will return
+    /// false.
+    //* =====================================================================
+    void close();
 
 private:
     boost::asio::ip::tcp::socket socket_;
