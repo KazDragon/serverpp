@@ -2,6 +2,7 @@
 
 #include "serverpp/core.hpp"
 #include <boost/asio/ip/tcp.hpp>
+#include <iostream>
 
 namespace serverpp {
 
@@ -18,11 +19,7 @@ public:
     explicit tcp_socket(boost::asio::ip::tcp::socket &&socket);
 
     //* =====================================================================
-    /// \brief Returns whether the socket is alive.
-    ///
-    /// Note: it may be that data still remains to be read.  Therefore, it
-    /// is only really worthwhile checking this as a result of receiving
-    /// a zero byte payload from async_read.
+    /// \brief Returns whether the socket is still alive.
     //* =====================================================================
     bool is_alive() const;
 
@@ -55,9 +52,10 @@ public:
         socket_.async_read_some(
             boost::asio::buffer(read_buffer_, read_buffer_.size()),
             [this, read_continuation](
-                boost::system::error_code ec,
+                boost::system::error_code const &ec,
                 std::size_t bytes_transferred)
             {
+                alive_ = !ec;
                 read_continuation(
                     bytes{read_buffer_.data(), bytes_transferred});
             });
@@ -74,6 +72,7 @@ public:
 private:
     boost::asio::ip::tcp::socket socket_;
     byte_storage                 read_buffer_;
+    bool                         alive_;
 };
 
 }
