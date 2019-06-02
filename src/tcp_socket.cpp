@@ -23,7 +23,7 @@ tcp_socket::tcp_socket(boost::asio::ip::tcp::socket &&socket)
 // ==========================================================================
 bool tcp_socket::is_alive() const
 {
-    return socket_.is_open();
+    return alive_;
 }
 
 // ==========================================================================
