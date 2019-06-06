@@ -3,24 +3,9 @@
 namespace serverpp {
 
 // ==========================================================================
-// CONSTRUCTOR
-// ==========================================================================
-tcp_server::tcp_server(port_identifier port)
-  : acceptor_(
-        context_,
-        boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-    work_(boost::asio::make_work_guard(context_)),
-    port_(acceptor_.local_endpoint().port())
-{
-}
-
-// ==========================================================================
 // DESTRUCTOR
 // ==========================================================================
-tcp_server::~tcp_server()
-{
-    shutdown();
-}
+tcp_server::~tcp_server() = default;
 
 // ==========================================================================
 // PORT
@@ -35,8 +20,7 @@ port_identifier tcp_server::port() const
 // ==========================================================================
 void tcp_server::shutdown()
 {
-    work_.reset();
-    context_.stop();
+    acceptor_.close();
 }
 
 }
