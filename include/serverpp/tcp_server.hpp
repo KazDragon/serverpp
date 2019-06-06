@@ -16,11 +16,29 @@ class SERVERPP_EXPORT tcp_server final
 public:
     //* =====================================================================
     /// Constructor
+    /// \param io_context A io_context on which this server and all of its
+    ///        sockets will be based.
     /// \param port the port identifier of the server.  If this is zero, then 
     ///        it is considered a wildcard port, which may bind to any unused
     ///        port.  This number can be retrieved with tcp_server::port.
+    /// \param acceptance_continuation A continuation function in the form 
+    ///        <tt>void (socket&&)</tt> that is called when a new connection
+    ///        is accepted.  
     //* =====================================================================
-    explicit tcp_server(port_identifier port);
+    template <class AcceptanceContinuation>
+    explicit tcp_server(
+        boost::asio::io_service& io_context,
+        port_identifier port,
+        AcceptanceContinuation &&acceptance_continuation)
+      : acceptor_(
+            io_context,
+            boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
+        socket_(io_context),
+        port_(acceptor_.local_endpoint().port())
+    {
+        schedule_acceptance(
+            std::forward<AcceptanceContinuation>(acceptance_continuation));
+    }
 
     //* =====================================================================
     /// Destructor
@@ -35,66 +53,36 @@ public:
     //* =====================================================================
     /// Shut the server down.
     ///
-    /// In a multi-threaded situation, this must be called before destruction
-    /// and destruction must occur after any threads running the server have
-    /// completed.  I.e. server->shutdown(), thread.join(), delete server.
+    /// Stops the server from accepting any new connections.  Existing
+    /// connections remain alive and must be shut down separately.  Care
+    /// must be taken to ensure that any threads running the io_service that
+    /// this server is running on are joined and finished before this object
+    /// is destroyed.
     //* =====================================================================
     void shutdown();
 
-    //* =====================================================================
-    /// Accepts incoming sockets to the server and handles sockets.
-    ///
-    /// \tparam AcceptanceContinuation A function in the form 
-    /// <tt>void (socket&&)</tt> that accepts new connections.
-    ///
-    /// \par
-    /// This is a BLOCKING call, and is also re-entrant.  Handlers for the
-    /// acceptance of new sockets and for I/O with existing sockets will be
-    /// called from within the threads that are calling this function.
-    ///
-    /// \par
-    /// Calls to this function will return before destruction is completed.
-    //* =====================================================================
-    template <typename AcceptanceContinuation>
-    void accept(AcceptanceContinuation &&acceptance_continuation)
-    {
-        auto new_socket = boost::asio::ip::tcp::socket{context_};
-
-        schedule_acceptance(
-            new_socket,
-            std::forward<AcceptanceContinuation>(acceptance_continuation));
-
-        context_.run();
-    }
-
 private:
     template <typename AcceptanceContinuation>
-    void schedule_acceptance(
-        boost::asio::ip::tcp::socket &new_socket,
-        AcceptanceContinuation &&acceptance_continuation)
+    void schedule_acceptance(AcceptanceContinuation &&acceptance_continuation)
     {
         const auto &acceptance_handler =
             [
                 this, 
-                acceptance_continuation,
-                &new_socket
+                acceptance_continuation
             ](boost::system::error_code const &ec)
             {
                 if (!ec)
                 {
-                    acceptance_continuation(tcp_socket(std::move(new_socket)));
-                    schedule_acceptance(new_socket, acceptance_continuation);
+                    acceptance_continuation(tcp_socket(std::move(socket_)));
+                    schedule_acceptance(acceptance_continuation);
                 }
             };
 
-        acceptor_.async_accept(new_socket, acceptance_handler);
+        acceptor_.async_accept(socket_, acceptance_handler);
     }
 
-    boost::asio::io_context context_;
-    boost::asio::executor_work_guard<
-        boost::asio::io_context::executor_type> work_;
-        
     boost::asio::ip::tcp::acceptor acceptor_;
+    boost::asio::ip::tcp::socket socket_;
     port_identifier port_;
 };
 

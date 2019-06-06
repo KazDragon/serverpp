@@ -1,4 +1,7 @@
 #include <serverpp/tcp_server.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 #include <algorithm>
 #include <functional>
 #include <future>
@@ -12,18 +15,21 @@ class echo_server
 {
 public:
     echo_server()
-      : tcp_server_(0)
+      : work_(boost::asio::make_work_guard(io_context_)),
+        tcp_server_(
+            io_context_, 
+            0, 
+            [this](auto &&new_socket) 
+            { 
+                this->new_connection(std::forward<decltype(new_socket)>(new_socket));
+            })
     {
         std::cout << "TCP Server started up on port " << tcp_server_.port() << "\n";
     }
 
     void run()
     {
-        tcp_server_.accept(
-            [this](serverpp::tcp_socket &&new_socket)
-            {
-                new_connection(std::move(new_socket));
-            });
+        io_context_.run();
     }
 
 private:
@@ -66,7 +72,9 @@ private:
 
             if (std::any_of(data.begin(), data.end(), [](auto ch){ return ch == 'Q'; }))
             {
+                work_.reset();
                 tcp_server_.shutdown();
+                close_all_sockets();
             }
             else
             {
@@ -79,24 +87,43 @@ private:
     {
         std::unique_lock<std::mutex> lock(connections_mutex_);
 
-        for (auto &connection : connections_)
+        const auto is_dead_socket = [&dead_socket](auto const &connection)
         {
-            if (connection.get() == &dead_socket)
+            return connection.get() == &dead_socket;
+        };
+
+        using boost::adaptors::filtered;
+
+        boost::for_each(
+            connections_ | filtered(is_dead_socket),
+            [](auto &connection)
             {
                 connection.reset();
-            }
-        }
+            });
 
-        connections_.erase(
-            std::remove_if(
-                connections_.begin(),
-                connections_.end(),
-                [](auto &connection)
-                {
-                    return !connection;
-                }),
-            connections_.end());
+        boost::remove_erase_if(
+            connections_,
+            [](auto const &connection)
+            {
+                return !connection;
+            });
     }
+
+    void close_all_sockets()
+    {
+        std::unique_lock<std::mutex> lock(connections_mutex_);
+
+        boost::for_each(
+            connections_,
+            [](auto &connection)
+            {
+                connection->close();
+            });
+    }
+
+    boost::asio::io_context io_context_;
+    boost::asio::executor_work_guard<
+        boost::asio::io_context::executor_type> work_;
 
     serverpp::tcp_server tcp_server_;
 
