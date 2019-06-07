@@ -135,16 +135,10 @@ int main()
 {
     auto server = std::unique_ptr<echo_server>(new echo_server);
 
-    auto const& executor = 
-        [server = server.get()]
-        {
-            server->run();
-        };
-
     std::vector<std::thread> threads;
     for (int i = 0; i < std::thread::hardware_concurrency(); ++i)
     {
-        threads.emplace_back(executor);
+        threads.emplace_back([&server]{server->run();});
     }
 
     for (auto &thread : threads)
