@@ -27,7 +27,7 @@ public:
     //* =====================================================================
     template <class AcceptanceContinuation>
     explicit tcp_server(
-        boost::asio::io_service& io_context,
+        boost::asio::io_context& io_context,
         port_identifier port,
         AcceptanceContinuation &&acceptance_continuation)
       : acceptor_(
@@ -55,7 +55,7 @@ public:
     ///
     /// Stops the server from accepting any new connections.  Existing
     /// connections remain alive and must be shut down separately.  Care
-    /// must be taken to ensure that any threads running the io_service that
+    /// must be taken to ensure that any threads running the io_context that
     /// this server is running on are joined and finished before this object
     /// is destroyed.
     //* =====================================================================
