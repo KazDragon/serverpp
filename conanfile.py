@@ -3,7 +3,7 @@ from conans import CMake
 
 class ConanServerpp(ConanFile):
     name = "serverpp"
-    version = "0.0.2"
+    version = "0.0.3"
     url = "https://github.com/KazDragon/serverpp"
     author = "KazDragon"
     license = "MIT"
@@ -12,7 +12,7 @@ class ConanServerpp(ConanFile):
     exports = "*.hpp", "*.in", "*.cpp", "CMakeLists.txt", "*.md", "LICENSE"
     description = "A library for a simple networking server"
     requires = ("boost_asio/[>=1.69]@bincrafters/stable",
-                "gsl-lite/[>=0.26]@nonstd-lite/stable")
+                "gsl-lite/[>=0.34]@nonstd-lite/stable")
     options = {"shared": [True, False], "withTests": [True, False], "coverage": [True, False], "sanitize" : ["off", "address"]}
     default_options = {"shared": False, "withTests": False, "coverage": False, "sanitize": "off"}
 
