@@ -44,28 +44,15 @@ if (SERVERPP_COVERAGE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 endif()
 
-set (SERVERPP_PUBLIC_SOURCE_FILES
-    src/tcp_server.cpp
-    src/tcp_socket.cpp
-)
+add_library(serverpp)
 
-set (SERVERPP_PUBLIC_HEADER_FILES
-    include/serverpp/tcp_server.hpp
-    include/serverpp/tcp_socket.hpp
-    include/serverpp/version.hpp
-)
-
-set (SERVERPP_PRIVATE_SOURCE_FILES
-)
-
-set (SERVERPP_PRIVATE_HEADER_FILES
-)
-
-add_library(serverpp
-    ${SERVERPP_PUBLIC_HEADER_FILES}
-    ${SERVERPP_PUBLIC_SOURCE_FILES}
-    ${SERVERPP_PRIVATE_SOURCE_FILES}
-    ${SERVERPP_PRIVATE_INCLUDE_FILES}
+target_sources(serverpp
+    PRIVATE
+        src/tcp_server.cpp
+        src/tcp_socket.cpp
+        include/serverpp/tcp_server.hpp
+        include/serverpp/tcp_socket.hpp
+        include/serverpp/version.hpp
 )
 
 target_link_libraries(serverpp
