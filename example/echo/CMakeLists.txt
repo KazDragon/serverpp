@@ -12,22 +12,19 @@ if (POLICY CMP0063)
     cmake_policy(SET CMP0063 OLD) # Do not allow hidden visibility for static libs
 endif()
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+endif()
 
 # The required C++ Standard for Server++ is C++14.
 set(CMAKE_CXX_STANDARD 14)
 
-set (ECHO_SERVER_PUBLIC_SOURCE_FILES
-    src/echo_server.cpp
-)
+add_executable(echo_server)
 
-set (ECHO_SERVER_PUBLIC_HEADER_FILES
-)
-
-add_executable(echo_server
-    ${ECHO_SERVER_PUBLIC_HEADER_FILES}
-    ${ECHO_SERVER_PUBLIC_SOURCE_FILES}
+target_sources(echo_server
+    PRIVATE
+        src/echo_server.cpp
 )
 
 target_link_libraries(echo_server

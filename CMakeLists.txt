@@ -1,6 +1,6 @@
 if (POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
-    project(SERVERPP VERSION 0.0.3)
+    project(SERVERPP VERSION 0.0.4)
 else()
     project(SERVERPP)
 endif()
@@ -12,16 +12,16 @@ if (POLICY CMP0063)
     cmake_policy(SET CMP0063 OLD) # Do not allow hidden visibility for static libs
 endif()
 
-option(SERVERPP_WITH_TESTS "Build with tests included" False)
 option(SERVERPP_COVERAGE  "Build with code coverage options")
 option(SERVERPP_SANITIZE "Build using sanitizers" "")
 message("Building Server++ with config: ${CMAKE_BUILD_TYPE}")
-message("Building Server++ with tests: ${SERVERPP_WITH_TESTS}")
 message("Building Server++ with code coverage: ${SERVERPP_COVERAGE}")
 message("Building Server++ with sanitizers: ${SERVERPP_SANITIZE}")
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+endif()
 
 # The required C++ Standard for Server++ is C++14.
 set(CMAKE_CXX_STANDARD 14)
@@ -70,86 +70,12 @@ set_target_properties(serverpp
 
 target_include_directories(serverpp
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include/serverpp-${SERVERPP_VERSION}>
-        "${Boost_INCLUDE_DIRS}"
+        ${PROJECT_SOURCE_DIR}/include
 )
 
 generate_export_header(serverpp
     EXPORT_FILE_NAME "${PROJECT_SOURCE_DIR}/include/serverpp/detail/export.hpp"
 )
-
-configure_file(
-    ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp.in
-    ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp
-    @ONLY)
-
-install(
-    TARGETS
-        serverpp
-    EXPORT
-        serverpp-config
-    ARCHIVE DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
-    LIBRARY DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
-)
-
-install(
-    DIRECTORY
-        include/
-    DESTINATION
-        include/serverpp-${SERVERPP_VERSION}
-)
-
-export(
-    EXPORT
-        serverpp-config
-    FILE
-        "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config.cmake"
-)
-
-install(
-    EXPORT
-        serverpp-config
-    DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
-)
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
-    VERSION
-        "${SERVERPP_VERSION}"
-    COMPATIBILITY AnyNewerVersion
-)
-
-install(
-    FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
-    DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
-)
-
-if (SERVERPP_WITH_TESTS)
-    enable_testing()
-
-    set(serverpp_tester_tests
-        test/dummy.cpp
-    )
-
-    add_executable(serverpp_tester
-        ${serverpp_tester_tests}
-    )
-
-    target_link_libraries(serverpp_tester
-        PRIVATE
-            serverpp
-            CONAN_PKG::gtest
-    )
-
-    add_test(serverpp_test serverpp_tester)
-endif()
 
 # Add a rule for generating documentation
 if (DOXYGEN_FOUND)

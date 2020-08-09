@@ -3,7 +3,7 @@ from conans import CMake
 
 class ConanServerpp(ConanFile):
     name = "serverpp"
-    version = "0.0.3"
+    version = "0.0.4"
     url = "https://github.com/KazDragon/serverpp"
     author = "KazDragon"
     license = "MIT"
@@ -12,17 +12,12 @@ class ConanServerpp(ConanFile):
     exports = "*.hpp", "*.in", "*.cpp", "CMakeLists.txt", "*.md", "LICENSE"
     description = "A library for a simple networking server"
     requires = ("boost/[>=1.69]", "gsl-lite/[>=0.34]")
-    options = {"shared": [True, False], "withTests": [True, False], "coverage": [True, False], "sanitize" : ["off", "address"]}
-    default_options = {"shared": False, "withTests": False, "coverage": False, "sanitize": "off"}
-
-    def requirements(self):
-        if (self.options.withTests):
-            self.requires("gtest/[>=1.8.1]@bincrafters/stable")
+    options = {"shared": [True, False], "coverage": [True, False], "sanitize" : ["off", "address"]}
+    default_options = {"shared": False, "coverage": False, "sanitize": "off"}
 
     def configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["BUILD_SHARED_LIBS"] = self.options.shared
-        cmake.definitions["SERVERPP_WITH_TESTS"] = self.options.withTests
         cmake.definitions["SERVERPP_COVERAGE"] = self.options.coverage
         cmake.definitions["SERVERPP_SANITIZE"] = self.options.sanitize
         cmake.configure()
