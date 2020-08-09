@@ -11,8 +11,7 @@ class ConanServerpp(ConanFile):
     generators = "cmake"
     exports = "*.hpp", "*.in", "*.cpp", "CMakeLists.txt", "*.md", "LICENSE"
     description = "A library for a simple networking server"
-    requires = ("boost_asio/[>=1.69]@bincrafters/stable",
-                "gsl-lite/[>=0.34]@nonstd-lite/stable")
+    requires = ("boost/[>=1.69]", "gsl-lite/[>=0.34]")
     options = {"shared": [True, False], "withTests": [True, False], "coverage": [True, False], "sanitize" : ["off", "address"]}
     default_options = {"shared": False, "withTests": False, "coverage": False, "sanitize": "off"}
 

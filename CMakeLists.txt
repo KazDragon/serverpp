@@ -58,7 +58,7 @@ target_sources(serverpp
 target_link_libraries(serverpp
     PUBLIC
         CONAN_PKG::gsl-lite
-        CONAN_PKG::boost_asio
+        CONAN_PKG::boost
 )
 
 set_target_properties(serverpp
