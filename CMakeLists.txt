@@ -18,13 +18,14 @@ message("Building Server++ with config: ${CMAKE_BUILD_TYPE}")
 message("Building Server++ with code coverage: ${SERVERPP_COVERAGE}")
 message("Building Server++ with sanitizers: ${SERVERPP_SANITIZE}")
 
-if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
-endif()
-
 # The required C++ Standard for Server++ is C++14.
 set(CMAKE_CXX_STANDARD 14)
+
+# Telnet++ requires at least Boost 1.69.
+find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
+
+# Telnet++ requires exactly version 0.34 of gsl-lite
+find_package(gsl-lite 0.34.0 EXACT REQUIRED)
 
 # When building shared objects, etc., we only want to export certain symbols.
 # Therefore, we need to generate a header suitable for declaring which
@@ -57,8 +58,8 @@ target_sources(serverpp
 
 target_link_libraries(serverpp
     PUBLIC
-        CONAN_PKG::gsl-lite
-        CONAN_PKG::boost
+        Boost::boost
+        gsl::gsl-lite
 )
 
 set_target_properties(serverpp
@@ -70,11 +71,64 @@ set_target_properties(serverpp
 
 target_include_directories(serverpp
     PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include/serverpp-${SERVERPP_VERSION}>
 )
 
 generate_export_header(serverpp
     EXPORT_FILE_NAME "${PROJECT_SOURCE_DIR}/include/serverpp/detail/export.hpp"
+)
+
+configure_file(
+    ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp.in
+    ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp
+    @ONLY)
+
+install(
+    TARGETS
+        serverpp
+    EXPORT
+        serverpp-config
+    ARCHIVE DESTINATION
+        lib/serverpp-${SERVERPP_VERSION}
+    LIBRARY DESTINATION
+        lib/serverpp-${SERVERPP_VERSION}
+)
+
+install(
+    DIRECTORY
+        include/
+    DESTINATION
+        include/serverpp-${SERVERPP_VERSION}
+)
+
+export(
+    EXPORT
+        serverpp-config
+    FILE
+        "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config.cmake"
+)
+
+install(
+    EXPORT
+        serverpp-config
+    DESTINATION
+        lib/serverpp-${SERVERPP_VERSION}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
+    VERSION
+        "${SERVERPP_VERSION}"
+    COMPATIBILITY AnyNewerVersion
+)
+
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
+    DESTINATION
+        lib/serverpp-${SERVERPP_VERSION}
 )
 
 # Add a rule for generating documentation
