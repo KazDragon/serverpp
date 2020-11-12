@@ -18,14 +18,33 @@ message("Building Server++ with config: ${CMAKE_BUILD_TYPE}")
 message("Building Server++ with code coverage: ${SERVERPP_COVERAGE}")
 message("Building Server++ with sanitizers: ${SERVERPP_SANITIZE}")
 
+if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    message("Using Conan due to conanbuildinfo.cmake")
+    set(SERVERPP_USE_CONAN ON)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS)
+endif()
+
 # The required C++ Standard for Server++ is C++14.
 set(CMAKE_CXX_STANDARD 14)
 
-# Telnet++ requires at least Boost 1.69.
-find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
+if (SERVERPP_USE_CONAN)
+    set(SERVERPP_PUBLIC_LIBRARIES
+        CONAN_PKG::boost
+        CONAN_PKG::gsl-lite
+    )
+else()
+    # Telnet++ requires at least Boost 1.69.
+    find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
 
-# Telnet++ requires exactly version 0.34 of gsl-lite
-find_package(gsl-lite 0.34.0 EXACT REQUIRED)
+    # Telnet++ requires exactly version 0.34 of gsl-lite
+    find_package(gsl-lite 0.34.0 EXACT REQUIRED)
+
+    set(SERVERPP_PUBLIC_LIBRARIES 
+        Boost::boost
+        gsl::gsl-lite
+    )
+endif()
 
 # When building shared objects, etc., we only want to export certain symbols.
 # Therefore, we need to generate a header suitable for declaring which
@@ -58,8 +77,7 @@ target_sources(serverpp
 
 target_link_libraries(serverpp
     PUBLIC
-        Boost::boost
-        gsl::gsl-lite
+        ${SERVERPP_PUBLIC_LIBRARIES}
 )
 
 set_target_properties(serverpp
