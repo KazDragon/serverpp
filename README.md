@@ -27,9 +27,9 @@ Server++ can be installed from source using CMake.  This requires Boost, GSL-Lit
 
 # Installation - Conan
 
-You can also use [The Conan Package Manager](https://conan.io/) to install Server++ and its dependencies.
+You can also use [The Conan Package Manager](https://conan.io/) to build and/or install Server++ and its dependencies.
 
-See [the echo server](example/echo) for a minimalistic project that describes this setup.
+See [the echo server](example/echo) for a minimalistic project that uses Conan in order to fetch Server++ as a dependency.  Alternatively, [the Travis script](.travis.yml) for continuous integration also verifies that Server++ itself can be built using Conan.
 
 # Features / Roadmap / Progress
 
