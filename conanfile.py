@@ -3,7 +3,7 @@ from conans import CMake
 
 class ConanServerpp(ConanFile):
     name = "serverpp"
-    version = "0.0.5"
+    version = "0.0.7"
     url = "https://github.com/KazDragon/serverpp"
     author = "KazDragon"
     license = "MIT"
