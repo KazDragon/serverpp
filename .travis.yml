@@ -33,7 +33,14 @@ linux_clang: &linux_clang
 jobs:
   include:
     - <<: *linux_gcc
-#    - <<: *linux_clang
+    - <<: *linux_clang
+    - <<: *linux_gcc
+      addons:
+        apt:
+          packages:
+            python3-pip
+      env: USE_CONAN=true
+        
 
 cache:
   directories:
@@ -42,7 +49,11 @@ cache:
 
 before_install:
   - export EXTERNAL_ROOT=$HOME/3party
-  - ./.travis/fetch_system_dependencies.sh
+  - if [ "$USE_CONAN" == "true" ]; then
+      ./.travis/fetch_conan_dependencies.sh;
+    else
+      ./.travis/fetch_system_dependencies.sh;
+    fi
 
 before_script:
   - mkdir build || true
