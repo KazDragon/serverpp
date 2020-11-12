@@ -1,6 +1,6 @@
 if (POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
-    project(SERVERPP VERSION 0.0.6)
+    project(SERVERPP VERSION 0.0.7)
 else()
     project(SERVERPP)
 endif()
