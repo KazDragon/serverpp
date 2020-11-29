@@ -15,6 +15,19 @@ endif()
 if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+
+    set(ECHO_SERVER_PRIVATE_LIBRARIES
+        CONAN_PKG::serverpp
+    )
+else()
+    find_package(serverpp REQUIRED)
+    find_package(gsl-lite REQUIRED)
+    find_package(Boost REQUIRED)
+    find_package(Threads REQUIRED)
+
+    set(ECHO_SERVER_PRIVATE_LIBRARIES
+        KazDragon::serverpp
+    )
 endif()
 
 # The required C++ Standard for Server++ is C++14.
@@ -28,5 +41,5 @@ target_sources(echo_server
 )
 
 target_link_libraries(echo_server
-    CONAN_PKG::serverpp
+    ${ECHO_SERVER_PRIVATE_LIBRARIES}
 )
