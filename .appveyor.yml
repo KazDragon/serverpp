@@ -10,7 +10,7 @@ configuration:
   - Release
 
 environment:
-  APPVEYOR_SAVE_CACHE_ON_ERROR:: true
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
 
   matrix:
     - platform: x64
