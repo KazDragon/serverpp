@@ -5,7 +5,7 @@ on: [push]
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  EXTERNAL_ROOT: $HOME/3party
+  EXTERNAL_ROOT: /home/runner/3party
 
 jobs:
   build:
