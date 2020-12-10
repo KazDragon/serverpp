@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/github/license/KazDragon/serverpp.svg)](https://en.wikipedia.org/wiki/MIT_License)
 [![GitHub Releases](https://img.shields.io/github/release/KazDragon/serverpp.svg)](https://github.com/KazDragon/serverpp/releases)
+![Build Status](https://github.com/KazDragon/serverpp/workflows/build-master-system/badge.svg?branch=master)
 [![Download](https://api.bintray.com/packages/kazdragon/conan-public/serverpp%3Akazdragon/images/download.svg)](https://bintray.com/kazdragon/conan-public/serverpp%3Akazdragon/_latestVersion)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b4737922bf834ff79f61019d09cf69e6)](https://www.codacy.com/gh/KazDragon/serverpp/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=KazDragon/serverpp&amp;utm_campaign=Badge_Grade)
 
