@@ -50,7 +50,6 @@ jobs:
       shell: bash
       run: ctest -C $BUILD_TYPE
 
-
   build-conan:
     runs-on: ubuntu-latest
 
@@ -59,6 +58,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+
+    # Build a cache for conan packages.  A new branch will create a copy of
+    # the master cache, but the master cache isn't updated until something is
+    # merged to the master branch.
+    - name: Cache conan packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.conan
+        key: conan-package-cache-${{ steps.extract_branch.outputs.branch }}
+        restore-keys: |
+          conan-package-cache-master
 
     - name: Install Conan
       run: |
@@ -72,10 +87,8 @@ jobs:
     - name: Install dependencies from Conan
       working-directory: ${{runner.workspace}}/build
       run: |
-        conan profile new default --detect
-        conan profile update settings.compiler.libcxx=libstdc++11 default
         conan config set general.request_timeout=120
-        conan install $GITHUB_WORKSPACE -s cppstd=14
+        conan install $GITHUB_WORKSPACE -s compiler.libcxx=libstdc++11 -s cppstd=14
 
     - name: Configure CMake
       shell: bash
