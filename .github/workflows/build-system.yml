@@ -1,6 +1,10 @@
 name: CMake
 
-on: [push, pull_request]
+on: 
+  pull_request:
+  push:
+    branches:
+      master
 
 env:
   EXTERNAL_ROOT: /home/runner/3party
