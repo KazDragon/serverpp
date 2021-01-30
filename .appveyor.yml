@@ -1,15 +1,6 @@
 image:
   - Visual Studio 2019
 
-# Build only on the master branch, for PRs
-branches:
-  only:
-    - master
-
-# Skip any commit that doesn't have [MSVC] in the commit message.
-only_commits:
-  message: /\[MSVC\]/
-
 build:
   parallel: true
   verbosity: detailed
