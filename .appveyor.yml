@@ -1,6 +1,11 @@
 image:
   - Visual Studio 2019
 
+# Build only on the master branch, and for PRs
+branches:
+  only:
+    - master
+    
 build:
   parallel: true
   verbosity: detailed
