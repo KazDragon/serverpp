@@ -41,7 +41,7 @@ else()
     find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
 
     # Server++ requires exactly version 0.34 of gsl-lite
-    find_package(gsl-lite 0.34.0 EXACT REQUIRED)
+    find_package(gsl-lite 0.34.0 REQUIRED)
 
     # Server++ requires the system threading library.
     find_package(Threads REQUIRED)
