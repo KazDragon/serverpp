@@ -33,16 +33,26 @@ if (SERVERPP_USE_CONAN)
         CONAN_PKG::boost
         CONAN_PKG::gsl-lite
     )
+
+    set(SERVERPP_PRIVATE_LIBRARIES
+    )
 else()
-    # Telnet++ requires at least Boost 1.69.
+    # Server++ requires at least Boost 1.69.
     find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
 
-    # Telnet++ requires exactly version 0.34 of gsl-lite
+    # Server++ requires exactly version 0.34 of gsl-lite
     find_package(gsl-lite 0.34.0 REQUIRED)
+
+    # Server++ requires the system threading library.
+    find_package(Threads REQUIRED)
 
     set(SERVERPP_PUBLIC_LIBRARIES 
         Boost::boost
         gsl::gsl-lite
+        Threads::Threads
+    )
+
+    set(SERVERPP_PRIVATE_LIBRARIES
     )
 endif()
 
@@ -65,6 +75,7 @@ if (SERVERPP_COVERAGE)
 endif()
 
 add_library(serverpp)
+add_library(KazDragon::serverpp ALIAS serverpp)
 
 target_sources(serverpp
     PRIVATE
@@ -78,6 +89,14 @@ target_sources(serverpp
 target_link_libraries(serverpp
     PUBLIC
         ${SERVERPP_PUBLIC_LIBRARIES}
+    PRIVATE
+        ${SERVERPP_PRIVATE_LIBRARIES}
+)
+
+target_include_directories(serverpp
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include/serverpp-${SERVERPP_VERSION}>
 )
 
 set_target_properties(serverpp
@@ -85,12 +104,20 @@ set_target_properties(serverpp
         CXX_VISIBILITY_PRESET hidden
         VERSION ${SERVERPP_VERSION}
         SOVERSION ${SERVERPP_VERSION}
+        DEBUG_POSTFIX "d"
 )
 
-target_include_directories(serverpp
-    PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include/serverpp-${SERVERPP_VERSION}>
+target_compile_options(serverpp
+    PRIVATE
+        # Do not generate warning C4251 (member needs dll linkage) on MSVC
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4251>
+        # Do not generate warning C4275 (type needs dll linkage) on MSVC
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4275>
+        # Any warning on MSVC is an error
+        $<$<CXX_COMPILER_ID:MSVC>:/WX>
+
+        # Add warnings on g++ and Clang
+        $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Wsign-conversion -Werror>
 )
 
 generate_export_header(serverpp
@@ -102,15 +129,50 @@ configure_file(
     ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp
     @ONLY)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${PROJECT_SOURCE_DIR}/cmake/serverpp-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/serverpp-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/serverpp
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
+    VERSION
+        "${SERVERPP_VERSION}"
+    COMPATIBILITY AnyNewerVersion
+)
+
+export(
+    TARGETS 
+        serverpp
+    NAMESPACE 
+        KazDragon::
+    FILE ${PROJECT_BINARY_DIR}/serverpp-targets.cmake
+)
+
 install(
     TARGETS
         serverpp
     EXPORT
-        serverpp-config
+        serverpp-targets
     ARCHIVE DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
+        ${CMAKE_INSTALL_LIBDIR}/serverpp-${SERVERPP_VERSION}
     LIBRARY DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
+        ${CMAKE_INSTALL_LIBDIR}/serverpp-${SERVERPP_VERSION}
+    RUNTIME DESTINATION
+        ${CMAKE_INSTALL_BINDIR}/serverpp-${SERVERPP_VERSION}
+)
+
+install(
+    EXPORT
+        serverpp-targets
+    NAMESPACE 
+        KazDragon::
+    DESTINATION
+        ${CMAKE_INSTALL_DATADIR}/serverpp-${SERVERPP_VERSION}
 )
 
 install(
@@ -120,33 +182,12 @@ install(
         include/serverpp-${SERVERPP_VERSION}
 )
 
-export(
-    EXPORT
-        serverpp-config
-    FILE
-        "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config.cmake"
-)
-
-install(
-    EXPORT
-        serverpp-config
-    DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
-)
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
-    VERSION
-        "${SERVERPP_VERSION}"
-    COMPATIBILITY AnyNewerVersion
-)
-
 install(
     FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/serverpp-config-version.cmake"
     DESTINATION
-        lib/serverpp-${SERVERPP_VERSION}
+        ${CMAKE_INSTALL_DATADIR}/serverpp-${SERVERPP_VERSION}
 )
 
 # Add a rule for generating documentation
