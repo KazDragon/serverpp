@@ -1,16 +1,5 @@
-if (POLICY CMP0048)
-    cmake_policy(SET CMP0048 NEW)
-    project(SERVERPP VERSION 0.0.8)
-else()
-    project(SERVERPP)
-endif()
-
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-cmake_policy(VERSION 3.2)
-
-if (POLICY CMP0063)
-    cmake_policy(SET CMP0063 OLD) # Do not allow hidden visibility for static libs
-endif()
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_policy(VERSION 3.13)
 
 option(SERVERPP_COVERAGE  "Build with code coverage options")
 option(SERVERPP_SANITIZE "Build using sanitizers" "")
@@ -25,8 +14,13 @@ if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS)
 endif()
 
-# The required C++ Standard for Server++ is C++14.
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+include(function-git_version)
+git_version(SERVERPP)
+message(STATUS "Server++ Version: ${SERVERPP_VERSION}")
+project(SERVERPP VERSION ${SERVERPP_VERSION})
 
 if (SERVERPP_USE_CONAN)
     set(SERVERPP_PUBLIC_LIBRARIES
@@ -76,6 +70,9 @@ endif()
 
 add_library(serverpp)
 add_library(KazDragon::serverpp ALIAS serverpp)
+
+# The required C++ Standard for Server++ is at least C++14.
+target_compile_features(serverpp PUBLIC cxx_std_14)
 
 target_sources(serverpp
     PRIVATE
