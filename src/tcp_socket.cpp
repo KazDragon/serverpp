@@ -31,7 +31,12 @@ bool tcp_socket::is_alive() const
 // ==========================================================================
 void tcp_socket::write(bytes data)
 {
-    socket_.write_some(boost::asio::const_buffer{data.begin(), data.size()});
+    boost::system::error_code ec;
+    socket_.write_some(
+        boost::asio::const_buffer{data.begin(), data.size()},
+        ec);
+
+    alive_ = !ec;
 }
 
 // ==========================================================================
