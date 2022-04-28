@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 cmake_policy(VERSION 3.13)
 
 option(SERVERPP_COVERAGE  "Build with code coverage options")
@@ -10,8 +10,11 @@ message("Building Server++ with sanitizers: ${SERVERPP_SANITIZE}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-include(function-git_version)
-git_version(SERVERPP)
+if (NOT SERVERPP_VERSION)
+    include(function-git_version)
+    git_version(SERVERPP)
+endif()
+
 message(STATUS "Server++ Version: ${SERVERPP_VERSION}")
 project(SERVERPP VERSION ${SERVERPP_VERSION})
 
