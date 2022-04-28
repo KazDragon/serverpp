@@ -71,7 +71,7 @@ private:
     void read_handler(serverpp::tcp_socket &socket, serverpp::bytes data)
     {
         std::cout << "Received " << data.size() << " bytes of data: " 
-                  << std::string(reinterpret_cast<char const *>(data.data()), data.length()) 
+                  << std::string(reinterpret_cast<char const *>(data.data()), data.size()) 
                   << "\n";
 
         if (data.empty())
@@ -112,7 +112,9 @@ private:
 
     void on_new_connection(serverpp::tcp_socket &&new_socket)
     {
-        std::cout << "Accepted new socket\n";
+        std::cout << "Accepted new socket from: " 
+                  << new_socket.get_ip_address() 
+                  << "\n";
         schedule_read(add_connection(std::move(new_socket)));
     }
 

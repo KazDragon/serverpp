@@ -62,6 +62,11 @@ public:
     }
 
     //* =====================================================================
+    /// Returns a string representation of the socket's remote IP address.
+    //* =====================================================================
+    std::string get_ip_address() const;
+
+    //* =====================================================================
     /// Closes the socket.
     ///
     /// This will cause any pending read to complete and is_alive will return
