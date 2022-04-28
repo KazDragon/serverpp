@@ -1,4 +1,5 @@
 #include "serverpp/tcp_socket.hpp"
+#include <boost/lexical_cast.hpp>
 #include <vector>
 
 namespace serverpp {
@@ -37,6 +38,15 @@ void tcp_socket::write(bytes data)
         ec);
 
     alive_ = !ec;
+}
+
+// ==========================================================================
+// GET_IP_ADDRESS
+// ==========================================================================
+std::string tcp_socket::get_ip_address() const
+{
+    return boost::lexical_cast<std::string>(
+        socket_.remote_endpoint().address());
 }
 
 // ==========================================================================
