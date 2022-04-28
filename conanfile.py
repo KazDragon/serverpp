@@ -8,7 +8,7 @@ class ConanServerpp(ConanFile):
     license = "MIT"
     settings = "os", "arch", "compiler", "build_type"
     generators = "cmake"
-    exports = "*.hpp", "*.in", "*.cpp", "CMakeLists.txt", "*.md", "LICENSE"
+    exports = "*.hpp", "*.in", "*.cpp", "CMakeLists.txt", "*.md", "LICENSE", "*.cmake"
     description = "A library for a simple networking server"
     requires = ("boost/[>=1.69]", "gsl-lite/[=0.34]")
     options = {"shared": [True, False], "coverage": [True, False], "sanitize" : ["off", "address"]}
@@ -19,6 +19,7 @@ class ConanServerpp(ConanFile):
         cmake.definitions["BUILD_SHARED_LIBS"] = self.options.shared
         cmake.definitions["SERVERPP_COVERAGE"] = self.options.coverage
         cmake.definitions["SERVERPP_SANITIZE"] = self.options.sanitize
+        cmake.definitions["SERVERPP_VERSION"] = self.version
         cmake.configure()
         return cmake
 
