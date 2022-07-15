@@ -37,8 +37,8 @@ else()
     # Server++ requires at least Boost 1.69.
     find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
 
-    # Server++ requires exactly version 0.34 of gsl-lite
-    find_package(gsl-lite 0.34.0 REQUIRED)
+    # Server++ requires at least version 0.38 of gsl-lite
+    find_package(gsl-lite 0.38.0 REQUIRED)
 
     # Server++ requires the system threading library.
     find_package(Threads REQUIRED)
@@ -73,9 +73,6 @@ endif()
 
 add_library(serverpp)
 add_library(KazDragon::serverpp ALIAS serverpp)
-
-# The required C++ Standard for Server++ is at least C++14.
-target_compile_features(serverpp PUBLIC cxx_std_14)
 
 target_sources(serverpp
     PRIVATE
@@ -119,6 +116,9 @@ target_compile_options(serverpp
         # Add warnings on g++ and Clang
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Wsign-conversion -Werror>
 )
+
+# The required C++ Standard for Server++ is at least C++17.
+target_compile_features(serverpp PUBLIC cxx_std_17)
 
 generate_export_header(serverpp
     EXPORT_FILE_NAME "${PROJECT_SOURCE_DIR}/include/serverpp/detail/export.hpp"

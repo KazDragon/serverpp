@@ -18,8 +18,7 @@ public:
         tcp_server_(
             io_context_, 
             0, 
-            [this](auto &&new_socket) 
-            { 
+            [this](auto &&new_socket) { 
                 this->on_new_connection(
                     std::forward<decltype(new_socket)>(new_socket));
             })
@@ -33,13 +32,12 @@ public:
     }
 
 private:
-    void socket_death_handler(serverpp::tcp_socket &dead_socket)
+    void socket_death_handler(std::shared_ptr<serverpp::tcp_socket> const &dead_socket)
     {
-        std::unique_lock<std::mutex> lock(connections_mutex_);
+        std::unique_lock lock{connections_mutex_};
 
-        const auto is_dead_socket = [&dead_socket](auto const &connection)
-        {
-            return connection.get() == &dead_socket;
+        const auto is_dead_socket = [&dead_socket](auto const &connection) {
+            return connection == dead_socket;
         };
 
         boost::remove_erase_if(connections_, is_dead_socket);
@@ -51,10 +49,9 @@ private:
 
     void close_all_sockets()
     {
-        std::unique_lock<std::mutex> lock(connections_mutex_);
+        std::unique_lock lock{connections_mutex_};
 
-        const auto close_connection = [](auto &connection)
-        {
+        const auto close_connection = [](auto &connection) {
             connection->close();
         };
 
@@ -68,7 +65,7 @@ private:
         close_all_sockets();
     }
 
-    void read_handler(serverpp::tcp_socket &socket, serverpp::bytes data)
+    void read_handler(std::shared_ptr<serverpp::tcp_socket> const &socket, serverpp::bytes data)
     {
         std::cout << "Received " << data.size() << " bytes of data: " 
                   << std::string(reinterpret_cast<char const *>(data.data()), data.size()) 
@@ -80,9 +77,11 @@ private:
         }
         else
         {
-            socket.write(data);
+            socket->write(data);
 
-            if (std::any_of(data.begin(), data.end(), [](auto ch){ return ch == 'Q'; }))
+            auto const is_quit_character = [](auto ch) { return ch == 'Q'; };
+
+            if (std::any_of(data.begin(), data.end(), is_quit_character))
             {
                 shutdown_server();
             }
@@ -93,18 +92,18 @@ private:
         }
     }
 
-    serverpp::tcp_socket &add_connection(serverpp::tcp_socket &&new_socket)
+    std::shared_ptr<serverpp::tcp_socket> add_connection(serverpp::tcp_socket &&new_socket)
     {
-        auto lock = std::unique_lock<std::mutex>{connections_mutex_};
+        auto lock = std::unique_lock{connections_mutex_};
         connections_.emplace_back(
-            new serverpp::tcp_socket(std::move(new_socket)));
-        return *connections_.back();
+            std::make_shared<serverpp::tcp_socket>(std::move(new_socket)));
+        return connections_.back();
     }
 
-    void schedule_read(serverpp::tcp_socket &socket)
+    void schedule_read(std::shared_ptr<serverpp::tcp_socket> const &socket)
     {
-        socket.async_read(
-            [this, &socket](serverpp::bytes data)
+        socket->async_read(
+            [this, socket](serverpp::bytes data)
             {
                 read_handler(socket, data);
             });
@@ -125,23 +124,21 @@ private:
     serverpp::tcp_server tcp_server_;
 
     std::mutex connections_mutex_;
-    std::vector<std::unique_ptr<serverpp::tcp_socket>> connections_;
+    std::vector<std::shared_ptr<serverpp::tcp_socket>> connections_;
 };
 
 int main()
 {
-    auto server = std::unique_ptr<echo_server>(new echo_server);
+    echo_server server;
 
     std::vector<std::thread> threads;
     for (int i = 0; i < std::thread::hardware_concurrency(); ++i)
     {
-        threads.emplace_back([&server]{server->run();});
+        threads.emplace_back([&server]{server.run();});
     }
 
     for (auto &thread : threads)
     {
         thread.join();
     }
-
-    server.reset();
 }
