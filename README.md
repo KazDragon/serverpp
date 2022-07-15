@@ -9,7 +9,7 @@
 
 # Requirements
 
-Server++ requires a C++14 compiler and the following libraries:
+Server++ requires a C++17 compiler and the following libraries:
   * Boost (At least version 1.69.0)
   * GSL-lite (At least version 1.38)
 
