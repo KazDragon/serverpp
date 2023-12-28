@@ -5,3 +5,5 @@ include/serverpp/version.hpp
 /CMakeSettings.json
 build
 .vscode
+.cache
+compile_commands.json
