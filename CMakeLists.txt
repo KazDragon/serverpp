@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 cmake_policy(VERSION 3.13)
 
 option(SERVERPP_COVERAGE  "Build with code coverage options")
@@ -7,7 +7,6 @@ message("Building Server++ with config: ${CMAKE_BUILD_TYPE}")
 message("Building Server++ with code coverage: ${SERVERPP_COVERAGE}")
 message("Building Server++ with sanitizers: ${SERVERPP_SANITIZE}")
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 if (NOT SERVERPP_VERSION)
@@ -35,7 +34,7 @@ if (SERVERPP_USE_CONAN)
     )
 else()
     # Server++ requires at least Boost 1.69.
-    find_package(Boost 1.69.0 REQUIRED COMPONENTS container)
+    find_package(Boost 1.69.0 REQUIRED)
 
     # Server++ requires at least version 0.38 of gsl-lite
     find_package(gsl-lite 0.38.0 REQUIRED)
