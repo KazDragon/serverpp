@@ -1,5 +1,0 @@
-[requires]
-serverpp/[>=0.0.5]@kazdragon/conan-public
-
-[generators]
-cmake
