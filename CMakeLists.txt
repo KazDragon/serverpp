@@ -17,40 +17,14 @@ endif()
 message(STATUS "Server++ Version: ${SERVERPP_VERSION}")
 project(SERVERPP VERSION ${SERVERPP_VERSION})
 
-if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    message("Using Conan due to conanbuildinfo.cmake")
-    set(SERVERPP_USE_CONAN ON)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup(TARGETS)
-endif()
+# Server++ requires at least Boost 1.69.
+find_package(Boost 1.69.0 REQUIRED)
 
-if (SERVERPP_USE_CONAN)
-    set(SERVERPP_PUBLIC_LIBRARIES
-        CONAN_PKG::boost
-        CONAN_PKG::gsl-lite
-    )
+# Server++ requires at least version 0.38 of gsl-lite
+find_package(gsl-lite 0.38.0 REQUIRED)
 
-    set(SERVERPP_PRIVATE_LIBRARIES
-    )
-else()
-    # Server++ requires at least Boost 1.69.
-    find_package(Boost 1.69.0 REQUIRED)
-
-    # Server++ requires at least version 0.38 of gsl-lite
-    find_package(gsl-lite 0.38.0 REQUIRED)
-
-    # Server++ requires the system threading library.
-    find_package(Threads REQUIRED)
-
-    set(SERVERPP_PUBLIC_LIBRARIES 
-        Boost::boost
-        gsl::gsl-lite
-        Threads::Threads
-    )
-
-    set(SERVERPP_PRIVATE_LIBRARIES
-    )
-endif()
+# Server++ requires the system threading library.
+find_package(Threads REQUIRED)
 
 # When building shared objects, etc., we only want to export certain symbols.
 # Therefore, we need to generate a header suitable for declaring which
@@ -84,9 +58,9 @@ target_sources(serverpp
 
 target_link_libraries(serverpp
     PUBLIC
-        ${SERVERPP_PUBLIC_LIBRARIES}
-    PRIVATE
-        ${SERVERPP_PRIVATE_LIBRARIES}
+        Boost::boost
+        gsl::gsl-lite
+        Threads::Threads
 )
 
 target_include_directories(serverpp
