@@ -2,8 +2,6 @@
 #include <boost/range/algorithm_ext/erase.hpp>
 #include <serverpp/tcp_server.hpp>
 #include <algorithm>
-#include <functional>
-#include <future>
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -18,7 +16,8 @@ class echo_server
       tcp_server_(
           io_context_,
           0,
-          [this](auto &&new_socket) {
+          [this](auto &&new_socket)
+          {
             this->on_new_connection(
                 std::forward<decltype(new_socket)>(new_socket));
           })
@@ -80,7 +79,7 @@ class echo_server
 
       auto const is_quit_character = [](auto ch) { return ch == 'Q'; };
 
-      if (std::any_of(data.begin(), data.end(), is_quit_character))
+      if (std::ranges::any_of(data, is_quit_character))
       {
         shutdown_server();
       }
@@ -128,6 +127,8 @@ int main()
   echo_server server;
 
   std::vector<std::thread> threads;
+  threads.reserve(std::thread::hardware_concurrency());
+
   for (unsigned int i = 0; i < std::thread::hardware_concurrency(); ++i)
   {
     threads.emplace_back([&server] { server.run(); });

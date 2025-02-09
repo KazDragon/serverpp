@@ -2,7 +2,7 @@
 
 #include "serverpp/core.hpp"
 #include <boost/asio/ip/tcp.hpp>
-#include <iostream>
+#include <concepts>  // IWYU pragma: keep
 
 namespace serverpp {
 
@@ -45,8 +45,7 @@ class tcp_socket final
   /// that scheduled the read), it is not intended that multiple reads be
   /// scheduled concurrently.
   //* =====================================================================
-  template <class ReadContinuation>
-  void async_read(ReadContinuation &&read_continuation)
+  void async_read(std::invocable<bytes> auto &&read_continuation)
   {
     socket_.async_read_some(
         boost::asio::buffer(read_buffer_, read_buffer_.size()),

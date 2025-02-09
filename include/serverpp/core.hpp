@@ -1,9 +1,9 @@
 #pragma once
 
 #include "serverpp/detail/export.hpp"  // IWYU pragma: export
-#include <gsl/gsl-lite.hpp>
 #include <cstdint>
 #include <string>
+#include <span>
 
 namespace serverpp {
 
@@ -15,7 +15,7 @@ using byte = std::uint8_t;
 // it is found.  For that reason, these spans should never be stored directly.
 // If storage is necessary, it much be converted into a longer-term data
 // structure.
-using bytes = gsl::span<byte const>;
+using bytes = std::span<byte const>;
 
 // Where necessary, bytes are stored in this type, which has the small string
 // optimization, meaning that most cases will not cause an allocation.
