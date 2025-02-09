@@ -7,7 +7,7 @@ namespace serverpp {
 // ==========================================================================
 port_identifier tcp_server::port() const
 {
-  return port_;
+    return port_;
 }
 
 // ==========================================================================
@@ -15,7 +15,7 @@ port_identifier tcp_server::port() const
 // ==========================================================================
 void tcp_server::shutdown()
 {
-  acceptor_.close();
+    acceptor_.close();
 }
 
 }  // namespace serverpp

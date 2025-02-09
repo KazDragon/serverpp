@@ -1,5 +1,7 @@
 #include "serverpp/tcp_socket.hpp"
+
 #include <boost/lexical_cast.hpp>
+
 #include <vector>
 
 namespace serverpp {
@@ -23,7 +25,7 @@ tcp_socket::tcp_socket(boost::asio::ip::tcp::socket &&socket)
 // ==========================================================================
 bool tcp_socket::is_alive() const
 {
-  return alive_;
+    return alive_;
 }
 
 // ==========================================================================
@@ -31,14 +33,14 @@ bool tcp_socket::is_alive() const
 // ==========================================================================
 void tcp_socket::write(bytes data)
 {
-  if (!data.empty())
-  {
-    boost::system::error_code errc;
-    socket_.write_some(
-        boost::asio::const_buffer{&*data.begin(), data.size()}, errc);
+    if (!data.empty())
+    {
+        boost::system::error_code errc;
+        socket_.write_some(
+            boost::asio::const_buffer{&*data.begin(), data.size()}, errc);
 
-    alive_ = !errc;
-  }
+        alive_ = !errc;
+    }
 }
 
 // ==========================================================================
@@ -46,7 +48,8 @@ void tcp_socket::write(bytes data)
 // ==========================================================================
 std::string tcp_socket::get_ip_address() const
 {
-  return boost::lexical_cast<std::string>(socket_.remote_endpoint().address());
+    return boost::lexical_cast<std::string>(
+        socket_.remote_endpoint().address());
 }
 
 // ==========================================================================
@@ -54,7 +57,7 @@ std::string tcp_socket::get_ip_address() const
 // ==========================================================================
 void tcp_socket::close()
 {
-  socket_.close();
+    socket_.close();
 }
 
 }  // namespace serverpp
