@@ -1,9 +1,10 @@
 #pragma once
 
 #include "serverpp/detail/export.hpp"  // IWYU pragma: export
-#include <cstdint>
-#include <string>
+
 #include <span>
+#include <string>
+#include <cstdint>
 
 namespace serverpp {
 
