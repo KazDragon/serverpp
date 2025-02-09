@@ -20,9 +20,6 @@ project(SERVERPP VERSION ${SERVERPP_VERSION})
 # Server++ requires at least Boost 1.69.
 find_package(Boost 1.69.0 REQUIRED)
 
-# Server++ requires at least version 0.38 of gsl-lite
-find_package(gsl-lite 0.38.0 REQUIRED)
-
 # Server++ requires the system threading library.
 find_package(Threads REQUIRED)
 
@@ -59,7 +56,6 @@ target_sources(serverpp
 target_link_libraries(serverpp
     PUBLIC
         Boost::boost
-        gsl::gsl-lite
         Threads::Threads
 )
 

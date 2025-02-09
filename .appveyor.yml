@@ -5,7 +5,7 @@ image:
 branches:
   only:
     - master
-    
+
 build:
   parallel: true
   verbosity: detailed
@@ -35,7 +35,6 @@ install:
   - cd %appveyor_build_folder%
   - vcpkg install boost-asio:%platform%-windows
   - vcpkg install boost-range:%platform%-windows
-  - vcpkg install gsl-lite:%platform%-windows
 
 build_script:
   - mkdir build

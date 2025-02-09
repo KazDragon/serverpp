@@ -13,12 +13,8 @@ if (POLICY CMP0063)
 endif()
 
 find_package(serverpp REQUIRED)
-find_package(gsl-lite REQUIRED)
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
-
-# The required C++ Standard for Server++ is C++14.
-set(CMAKE_CXX_STANDARD 14)
 
 add_executable(echo_server)
 

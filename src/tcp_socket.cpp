@@ -31,11 +31,14 @@ bool tcp_socket::is_alive() const
 // ==========================================================================
 void tcp_socket::write(bytes data)
 {
-  boost::system::error_code errc;
-  socket_.write_some(
-      boost::asio::const_buffer{data.begin(), data.size()}, errc);
+  if (!data.empty())
+  {
+    boost::system::error_code errc;
+    socket_.write_some(
+        boost::asio::const_buffer{&*data.begin(), data.size()}, errc);
 
-  alive_ = !errc;
+    alive_ = !errc;
+  }
 }
 
 // ==========================================================================
