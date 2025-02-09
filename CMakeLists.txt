@@ -90,8 +90,8 @@ target_compile_options(serverpp
         $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Wsign-conversion -Werror>
 )
 
-# The required C++ Standard for Server++ is at least C++17.
-target_compile_features(serverpp PUBLIC cxx_std_17)
+# The required C++ Standard for Server++ is at least C++20.
+target_compile_features(serverpp PUBLIC cxx_std_20)
 
 generate_export_header(serverpp
     EXPORT_FILE_NAME "${PROJECT_SOURCE_DIR}/include/serverpp/detail/export.hpp"
