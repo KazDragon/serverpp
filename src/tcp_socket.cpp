@@ -1,8 +1,6 @@
 #include "serverpp/tcp_socket.hpp"
 
-#include <boost/lexical_cast.hpp>
-
-#include <vector>
+#include <string>
 
 namespace serverpp {
 
@@ -48,8 +46,7 @@ void tcp_socket::write(bytes data)
 // ==========================================================================
 std::string tcp_socket::get_ip_address() const
 {
-    return boost::lexical_cast<std::string>(
-        socket_.remote_endpoint().address());
+    return socket_.remote_endpoint().address().to_string();
 }
 
 // ==========================================================================

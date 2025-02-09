@@ -1,5 +1,3 @@
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/algorithm_ext/erase.hpp>
 #include <serverpp/tcp_server.hpp>
 
 #include <algorithm>
@@ -38,7 +36,7 @@ private:
             return connection == dead_socket;
         };
 
-        boost::remove_erase_if(connections_, is_dead_socket);
+        std::erase_if(connections_, is_dead_socket);
 
         std::cout << "Connection died, " << connections_.size()
                   << " connections remaining\n";
@@ -52,7 +50,7 @@ private:
             connection->close();
         };
 
-        boost::for_each(connections_, close_connection);
+        std::ranges::for_each(connections_, close_connection);
     }
 
     void shutdown_server()
