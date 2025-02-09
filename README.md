@@ -9,8 +9,8 @@
 
 # Requirements
 
-Server++ requires a C++17 compiler and the following libraries:
-  * Boost (At least version 1.69.0)
+Server++ requires a C++20 compiler and the following libraries:
+  * Boost (At least version 1.69.0) (for Boost.Asio)
 
 # Installation - CMake
 
