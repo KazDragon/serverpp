@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: $VCPKG_ROOT/vcpkg install boost
+        run: $VCPKG_ROOT/vcpkg install boost-asio
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/serverpp/build
