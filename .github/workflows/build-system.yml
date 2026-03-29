@@ -27,7 +27,8 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: false
-          vcpkgDirectory: "${{ runner.workspace }}/vcpkg"
+          vcpkgDirectory: "${{ github.workspace }}/.vcpkg"
+          vcpkgGitCommitId: "58950f88544e4637524dbd6a01d0317cf4cb77fc"
 
       - name: Install dependencies
         shell: bash
