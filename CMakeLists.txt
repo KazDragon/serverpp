@@ -44,13 +44,22 @@ endif()
 add_library(serverpp)
 add_library(KazDragon::serverpp ALIAS serverpp)
 
+set(SERVERPP_GENERATED_INCLUDE_DIR
+    "${PROJECT_BINARY_DIR}/generated/include")
+set(SERVERPP_GENERATED_EXPORT_HEADER
+    "${SERVERPP_GENERATED_INCLUDE_DIR}/serverpp/detail/export.hpp")
+set(SERVERPP_GENERATED_VERSION_HEADER
+    "${SERVERPP_GENERATED_INCLUDE_DIR}/serverpp/version.hpp")
+
+file(MAKE_DIRECTORY "${SERVERPP_GENERATED_INCLUDE_DIR}/serverpp/detail")
+
 target_sources(serverpp
     PRIVATE
         src/tcp_server.cpp
         src/tcp_socket.cpp
         include/serverpp/tcp_server.hpp
         include/serverpp/tcp_socket.hpp
-        include/serverpp/version.hpp
+        ${SERVERPP_GENERATED_VERSION_HEADER}
 )
 
 target_link_libraries(serverpp
@@ -61,6 +70,7 @@ target_link_libraries(serverpp
 
 target_include_directories(serverpp
     PUBLIC
+        $<BUILD_INTERFACE:${SERVERPP_GENERATED_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include/serverpp-${SERVERPP_VERSION}>
 )
@@ -90,12 +100,12 @@ target_compile_options(serverpp
 target_compile_features(serverpp PUBLIC cxx_std_20)
 
 generate_export_header(serverpp
-    EXPORT_FILE_NAME "${PROJECT_SOURCE_DIR}/include/serverpp/detail/export.hpp"
+    EXPORT_FILE_NAME "${SERVERPP_GENERATED_EXPORT_HEADER}"
 )
 
 configure_file(
     ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp.in
-    ${PROJECT_SOURCE_DIR}/include/serverpp/version.hpp
+    ${SERVERPP_GENERATED_VERSION_HEADER}
     @ONLY)
 
 include(GNUInstallDirs)
@@ -149,6 +159,20 @@ install(
         include/
     DESTINATION
         include/serverpp-${SERVERPP_VERSION}
+)
+
+install(
+    FILES
+        "${SERVERPP_GENERATED_EXPORT_HEADER}"
+    DESTINATION
+        include/serverpp-${SERVERPP_VERSION}/serverpp/detail
+)
+
+install(
+    FILES
+        "${SERVERPP_GENERATED_VERSION_HEADER}"
+    DESTINATION
+        include/serverpp-${SERVERPP_VERSION}/serverpp
 )
 
 install(
