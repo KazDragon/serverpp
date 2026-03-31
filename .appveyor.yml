@@ -35,6 +35,8 @@ init:
 
 install:
   - cd %VCPKG_ROOT%
+  - if not exist "%VCPKG_DEFAULT_BINARY_CACHE%" mkdir "%VCPKG_DEFAULT_BINARY_CACHE%"
+  - if not exist "%VCPKG_ROOT%\downloads" mkdir "%VCPKG_ROOT%\downloads"
   - git fetch --tags --prune
   - git checkout 58950f88544e4637524dbd6a01d0317cf4cb77fc
   - .\bootstrap-vcpkg.bat
