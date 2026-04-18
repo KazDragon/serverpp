@@ -22,6 +22,20 @@ Server++ can be installed from source using CMake.  This requires Boost and any 
     cmake --build .
     sudo cmake --install .
 
+# Automated Releases
+
+Pushes to `master` that come from a merged pull request and pass the `CMake`
+workflow automatically publish a GitHub Release. The release version is chosen
+using the following precedence:
+
+- pull request labels `semver:major`, `semver:minor`, `semver:patch`
+- Conventional Commit cues from the PR title or commit subjects
+- contextual hints in the PR title/body such as `breaking` or `feature`
+- `patch` when nothing else matches
+
+Downstream consumers continue to get the standard GitHub release experience,
+including the automatically generated source archives for each tag.
+
 # Features / Roadmap / Progress
 
 1. [X] TCP server and sockets.
