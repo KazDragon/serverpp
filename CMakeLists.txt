@@ -9,7 +9,10 @@ message("Building Server++ with sanitizers: ${SERVERPP_SANITIZE}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-if (NOT SERVERPP_VERSION)
+if (SERVERPP_VERSION)
+    include(function-parse_version)
+    parse_version("${SERVERPP_VERSION}" "SERVERPP_")
+else()
     include(function-git_version)
     git_version(SERVERPP)
 endif()
